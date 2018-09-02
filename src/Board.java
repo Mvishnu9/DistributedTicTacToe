@@ -48,9 +48,60 @@ public class Board extends UnicastRemoteObject implements RMI_interface
     }
     
     @Override
-    public Boolean Move(int Player, int row, int col)
+    public Boolean Move(int Player, int mov)
     {
-        
+        if(mov > 9 || mov < 0)
+        {
+            return false;
+        }
+        int col = (mov-1)%3;
+        int row = (mov-1)/3;
+        if(board[row][col] == 'x' || board[row][col] == 'o')
+        {
+            return false;
+        }
+        else
+        {
+            if(Player != CurrPlayer)
+                return false;
+            if(Player == 0)
+                board[row][col] = 'x';
+            else
+                board[row][col] = 'o';
+            MovNum++;
+            CurrPlayer = (CurrPlayer+1)%2;
+            return true;
+        }
+    }
+    @Override
+    public int GameOver()
+    {
+        for(int i=0; i<3; i++)
+        {
+            if(board[i][0] == board[i][1])
+            {
+                if(board[i][1]==board[i][2])
+                {
+                    if(board[i][0] == 'x')
+                        return 1;
+                    else
+                        return 2;
+                }
+            }
+            else if(board[0][i]==board[1][i])
+            {
+                if(board[1][i]==board[2][i])
+                {
+                    if(board[0][i]=='x')
+                        return 1;
+                    else
+                        return 2;
+                }
+            }
+        }
+        if(MovNum == 9)
+            return 3;
+        return 0;
     }
     
 }

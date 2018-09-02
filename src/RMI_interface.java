@@ -14,7 +14,7 @@ import java.rmi.*;
 public interface RMI_interface extends Remote
 {
     public String getBoard() throws RemoteException;
-    public Boolean Move(int player, int row, int col) throws RemoteException;
+    public Boolean Move(int player, int mov) throws RemoteException;
     public int GameOver() throws RemoteException;
     
 }
