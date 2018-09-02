@@ -15,6 +15,8 @@ public interface RMI_interface extends Remote
 {
     public String getBoard() throws RemoteException;
     public Boolean Move(int player, int mov) throws RemoteException;
+    public int getPlayer() throws RemoteException;
+    public void SetLoss(int player) throws RemoteException;
     public int GameOver() throws RemoteException;
     
 }

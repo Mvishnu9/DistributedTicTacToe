@@ -19,11 +19,19 @@ public class Board extends UnicastRemoteObject implements RMI_interface
                            };
     private int MovNum;
     private int CurrPlayer;
+    private int Loss;
     public Board() throws RemoteException
     {
         super();
         this.MovNum = 0;
-        this.CurrPlayer=0;        
+        this.CurrPlayer = 0;
+        this.Loss = -1;
+    }
+    
+    @Override
+    public int getPlayer() throws RemoteException
+    {
+        return CurrPlayer;
     }
     
     @Override
@@ -48,6 +56,12 @@ public class Board extends UnicastRemoteObject implements RMI_interface
     }
     
     @Override
+    public void SetLoss(int Player)
+    {
+        Loss = Player;       
+    }
+    
+    @Override
     public Boolean Move(int Player, int mov)
     {
         if(mov > 9 || mov < 0)
@@ -56,26 +70,37 @@ public class Board extends UnicastRemoteObject implements RMI_interface
         }
         int col = (mov-1)%3;
         int row = (mov-1)/3;
-        if(board[row][col] == 'x' || board[row][col] == 'o')
+        synchronized(this)
         {
-            return false;
-        }
-        else
-        {
-            if(Player != CurrPlayer)
+            if(board[row][col] == 'x' || board[row][col] == 'o')
+            {
                 return false;
-            if(Player == 0)
-                board[row][col] = 'x';
+            }
             else
-                board[row][col] = 'o';
-            MovNum++;
-            CurrPlayer = (CurrPlayer+1)%2;
-            return true;
+            {
+                if(Player != CurrPlayer)
+                    return false;
+                if(Player == 0)
+                    board[row][col] = 'x';
+                else
+                    board[row][col] = 'o';
+                MovNum++;
+                CurrPlayer = (CurrPlayer+1)%2;
+                return true;
+            }
         }
     }
+    
     @Override
-    public int GameOver()
+    public synchronized int GameOver()
     {
+        if(Loss != -1)
+        {
+            if(Loss == 0)
+                return 2;
+            else 
+                return 1;
+        }
         for(int i=0; i<3; i++)
         {
             if(board[i][0] == board[i][1])
